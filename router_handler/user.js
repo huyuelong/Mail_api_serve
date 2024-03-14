@@ -2,6 +2,10 @@
 const db = require('../db/index')
 // 导入 bcryptjs 
 const bcrypt = require('bcryptjs')
+// 导入生成 Token 的包
+const jwt = require('jsonwebtoken')
+// 导入全局配置文件
+const config = require('../config')
 
 // 注册新用户的处理函数
 exports.regUser = (req, res) => {
@@ -37,9 +41,27 @@ exports.regUser = (req, res) => {
             res.cc('注册用户成功！', 0)
         })
     })
-}    
+}
 
 // 登录的处理函数
 exports.login = (req, res) => {
-    res.send('login OK')
+    const userinfo = req.body
+    const sql = 'select * from users where username=?'
+    // 执行 SQL 语句， 根据用户名查询用户的信息
+    db.query(sql, userinfo.username, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.length !== 1) return res.cc('登录失败！')
+        const compareResult = bcrypt.compareSync(userinfo.password, results[0].password)
+        if (!compareResult) return res.cc('登录失败！')
+        // 在服务器端生成Token字符串
+        // 去除密码和头像的值
+        const user = { ...results[0], password: '', user_avatar: '' }
+        // 生成 Token 字符串
+        const tokenstr = jwt.sign(user, config.jwtSecretKey, { expiresIn: config.expiresIn })
+        res.send({
+            status: 0,
+            message: '登录成功！',
+            token: 'Bearer ' + tokenstr
+        })
+    })
 }
