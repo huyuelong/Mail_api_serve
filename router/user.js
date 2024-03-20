@@ -12,9 +12,9 @@ const { reg_log_schema } = require('../schema/user')
 
 // 注册新用户
 router.post('/reguser', expressJoi(reg_log_schema), user_handler.regUser)
-
 // 登录
 router.post('/login', expressJoi(reg_log_schema), user_handler.login)
+
 
 
 module.exports = router
