@@ -7,7 +7,12 @@ const joi = require('joi')
 
 // 导入并配置 cors 中间件
 const cors = require('cors')
-app.use(cors())
+app.use(cors({
+    origin: '*'
+}))
+
+// 设置静态文件服务
+app.use(express.static('public'))
 
 // 配置解析表单数据的中间件, 解析 `application/x-www-form-urlencoded` 格式的表单数据
 app.use(express.urlencoded({ extended: false }))
