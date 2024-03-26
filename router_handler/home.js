@@ -2,24 +2,28 @@ const db = require('../db/index')
 
 // 获取banner轮播图数据
 exports.getBanners = (req, res) => {
-    const sql = 'SELECT * FROM banners';
-    db.query(sql, (error, results, fields) => {
+    // 获取查询参数 distributionSite，如果没有提供则默认为 1
+    const distribution_site = req.query.distribution_site || '1';
+
+    const sql = 'SELECT * FROM banners WHERE distribution_site = ?';
+    db.query(sql, distribution_site, (error, results) => {
         if (error) {
-            console.error(error)
+            console.error(error);
             res.status(500).json({
                 code: -1,
                 msg: '服务器错误',
                 result: []
-            })
+            });
         } else {
             res.status(200).json({
                 code: 1,
                 msg: '获取成功',
                 result: results
-            })
+            });
         }
-    })
-}
+    });
+};
+
 
 // 获取新品数据
 exports.getNews = async (req, res) => {
