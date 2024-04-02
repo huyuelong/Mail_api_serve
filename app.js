@@ -37,9 +37,11 @@ app.use(expressJWT.expressjwt({ secret: config.jwtSecretKey, algorithms: ["HS256
 const userRouter = require('./router/user')
 const categoriesRouter = require('./router/categories')
 const homeRouter = require('./router/home')
+const detailRouter = require('./router/detail')
 app.use('/api', userRouter)
 app.use('/api', categoriesRouter)
 app.use('/api', homeRouter)
+app.use('/api', detailRouter)
 
 // 定义错误级别中间件
 app.use(function (err, req, res, next) {
