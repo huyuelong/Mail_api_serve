@@ -6,14 +6,17 @@ const router = express.Router()
 const user_handler = require('../router_handler/user')
 
 // 1.导入验证数据的中间件
-const expressJoi = require('@escook/express-joi')
+// const expressJoi = require('@escook/express-joi')
+const bodyParser = require('body-parser')
 // 2.导入需要的验证规则对象
 const { reg_log_schema } = require('../schema/user')
 
 // 注册新用户
-router.post('/reguser', expressJoi(reg_log_schema), user_handler.regUser)
+// router.post('/reguser', expressJoi(reg_log_schema), user_handler.regUser)
+router.post('/reguser', bodyParser(reg_log_schema) , user_handler.regUser)
 // 登录
-router.post('/login', expressJoi(reg_log_schema), user_handler.login)
+// router.post('/login', expressJoi(reg_log_schema), user_handler.login)
+router.post('/login', bodyParser(reg_log_schema), user_handler.login)
 
 
 
