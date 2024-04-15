@@ -1,7 +1,12 @@
 // 导入express
 const express = require('express')
+// 使用 body-parser 中间件来解析 JSON 格式的请求体
+const bodyParser = require('body-parser');
 // 创建服务器实例对象
 const app = express()
+
+// 全局注册 body-parser 中间件来解析 JSON 格式的请求体
+app.use(bodyParser.json());
 
 const joi = require('joi')
 
@@ -38,10 +43,12 @@ const userRouter = require('./router/user')
 const categoriesRouter = require('./router/categories')
 const homeRouter = require('./router/home')
 const detailRouter = require('./router/detail')
+const cartRouter = require('./router/cart')
 app.use('/api', userRouter)
 app.use('/api', categoriesRouter)
 app.use('/api', homeRouter)
 app.use('/api', detailRouter)
+app.use('/api', cartRouter)
 
 // 定义错误级别中间件
 app.use(function (err, req, res, next) {
