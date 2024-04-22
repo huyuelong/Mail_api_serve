@@ -45,12 +45,16 @@ const homeRouter = require('./router/home')
 const detailRouter = require('./router/detail')
 const cartRouter = require('./router/cart')
 const addressRouter = require('./router/addresses')
+const orderRouter = require('./router/order')
+const payRouter = require('./router/pay')
 app.use('/api', userRouter)
 app.use('/api', categoriesRouter)
 app.use('/api', homeRouter)
 app.use('/api', detailRouter)
 app.use('/api', cartRouter)
 app.use('/api', addressRouter)
+app.use('/api', orderRouter)
+app.use('/api', payRouter)
 
 // 定义错误级别中间件
 app.use(function (err, req, res, next) {

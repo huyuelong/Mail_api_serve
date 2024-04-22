@@ -5,7 +5,7 @@ const config = require('../config')
 // 添加购物车
 exports.addCart = (req, res) => {
     console.log("Request body:", req.body); // 打印请求体
-    const { skuId, count } = req.body
+    const { skuId, count, istraded } = req.body
     const authorizationHeader = req.headers['authorization']
     const token = authorizationHeader?.replace("Bearer ", "")
 
@@ -20,8 +20,8 @@ exports.addCart = (req, res) => {
     }
 
     // 查询用户购物车中是否已经存在相同的 skuId
-    const checkExistingCartQuery = 'SELECT * FROM cart WHERE userId = ? AND skuId = ?'
-    const checkExistingCartValues = [userId, skuId]
+    const checkExistingCartQuery = 'SELECT * FROM cart WHERE userId = ? AND skuId = ? AND istraded = ?'
+    const checkExistingCartValues = [userId, skuId, istraded]
 
     db.query(checkExistingCartQuery, checkExistingCartValues, (checkErr, checkResult) => {
         if (checkErr) {
@@ -92,7 +92,7 @@ exports.getCart = (req, res) => {
         FROM cart
         INNER JOIN skus ON cart.skuId = skus.id
         INNER JOIN products ON skus.productId = products.id
-        WHERE cart.userId = ?
+        WHERE cart.userId = ? AND cart.istraded = 0
     `;
     const values = [userId]
 
