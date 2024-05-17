@@ -1,20 +1,20 @@
-const db = require('../db/index');
-const jwt = require('jsonwebtoken');
-const config = require('../config');
+const db = require('../db/index')
+const jwt = require('jsonwebtoken')
+const config = require('../config')
 
 // 创建订单
 exports.createOrder = async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
-    const token = authorizationHeader?.replace("Bearer ", "");
+    const authorizationHeader = req.headers['authorization']
+    const token = authorizationHeader?.replace("Bearer ", "")
 
     if (!token) {
-        return res.status(401).json({ code: 0, msg: "未提供授权的访问令牌" });
+        return res.status(401).json({ code: 0, msg: "未提供授权的访问令牌" })
     }
 
-    const userId = getUserIdFromToken(token);
+    const userId = getUserIdFromToken(token)
 
     if (!userId) {
-        return res.status(401).json({ code: 0, msg: "未授权的访问" });
+        return res.status(401).json({ code: 0, msg: "未授权的访问" })
     }
 
     const {
@@ -26,7 +26,7 @@ exports.createOrder = async (req, res) => {
         remark,
         cartIds,
         addressId
-    } = req.body;
+    } = req.body
 
     // 验证必需参数是否存在
     if (
@@ -34,12 +34,12 @@ exports.createOrder = async (req, res) => {
         deliveryFee === undefined || productPrice === undefined ||
         totalAmount === undefined || remark === undefined || cartIds === undefined || addressId === undefined
     ) {
-        return res.status(400).json({ code: 0, msg: "缺少必需的参数" });
+        return res.status(400).json({ code: 0, msg: "缺少必需的参数" })
     }
 
     try {
         const timeZoneOffset = 8; // 中国北京时间的时区偏移量为 +8
-        const createTime = new Date(Date.now() + timeZoneOffset * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ');
+        const createTime = new Date(Date.now() + timeZoneOffset * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ')
         const payLatestTime = new Date(Date.now() + timeZoneOffset * 60 * 60 * 1000 + 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ');
 
         // 计算倒计时
@@ -58,12 +58,12 @@ exports.createOrder = async (req, res) => {
                 (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        await db.query(insertQuery, [createTime, payMethod, payLatestTime, deliveryFee, productPrice, totalAmount, countdown, userId, deliveryType, addressId, cartIdsJSON]);
+        await db.query(insertQuery, [createTime, payMethod, payLatestTime, deliveryFee, productPrice, totalAmount, countdown, userId, deliveryType, addressId, cartIdsJSON])
 
-        return res.status(200).json({ code: 1, msg: "订单创建成功", result: cartIdsJSON });
+        return res.status(200).json({ code: 1, msg: "订单创建成功", result: cartIdsJSON })
     } catch (error) {
         console.error('Error creating order:', error);
-        return res.status(500).json({ code: 0, msg: "订单创建失败" });
+        return res.status(500).json({ code: 0, msg: "订单创建失败" })
     }
 }
 
@@ -104,32 +104,32 @@ exports.createOrder = async (req, res) => {
 // 自定义函数：从授权的 token 中获取用户 ID
 function getUserIdFromToken(token) {
     if (!token) {
-        return null;
+        return null
     }
 
     try {
-        const decoded = jwt.verify(token, config.jwtSecretKey);
-        return decoded.id;
+        const decoded = jwt.verify(token, config.jwtSecretKey)
+        return decoded.id
     } catch (error) {
-        console.error('Error decoding token:', error);
-        return null;
+        console.error('Error decoding token:', error)
+        return null
     }
 }
 
 
 // 获取用户最新订单的全部数据
 exports.getLatestOrder = async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
-    const token = authorizationHeader?.replace("Bearer ", "");
+    const authorizationHeader = req.headers['authorization']
+    const token = authorizationHeader?.replace("Bearer ", "")
 
     if (!token) {
-        return res.status(401).json({ code: 0, msg: "未提供授权的访问令牌" });
+        return res.status(401).json({ code: 0, msg: "未提供授权的访问令牌" })
     }
 
-    const userId = getUserIdFromToken(token);
+    const userId = getUserIdFromToken(token)
 
     if (!userId) {
-        return res.status(401).json({ code: 0, msg: "未授权的访问" });
+        return res.status(401).json({ code: 0, msg: "未授权的访问" })
     }
 
     try {
@@ -140,7 +140,7 @@ exports.getLatestOrder = async (req, res) => {
             WHERE userId = ?
             ORDER BY createTime DESC
             LIMIT 1
-        `;
+        `
 
         // const result = await db.query(query, [userId]);
 
@@ -151,32 +151,32 @@ exports.getLatestOrder = async (req, res) => {
                 } else {
                     resolve(result);
                 }
-            });
-        });
+            })
+        })
 
         if (result.length === 0) {
-            return res.status(404).json({ code: 0, msg: "找不到用户的订单" });
+            return res.status(404).json({ code: 0, msg: "找不到用户的订单" })
         }
 
         const latestOrder = result[0];
         // console.log('latestOrder: ', latestOrder)
 
         // 解析订单中的 cartIds
-        const cartIds = JSON.parse(latestOrder.cartIds);
+        const cartIds = JSON.parse(latestOrder.cartIds)
 
         // 更新购物车中相关条目的istraded值为1
         const updateCartQuery = `
             UPDATE cart
             SET istraded = 1
             WHERE id IN (?)
-        `;
+        `
 
         await new Promise((resolve, reject) => {
             db.query(updateCartQuery, [cartIds], (error, result) => {
                 if (error) {
-                    reject(error);
+                    reject(error)
                 } else {
-                    resolve(result);
+                    resolve(result)
                 }
             });
         });
@@ -186,23 +186,23 @@ exports.getLatestOrder = async (req, res) => {
             SELECT skuId, count
             FROM cart
             WHERE id IN (?)
-        `;
+        `
 
         // const cartInfoResult = await db.query(cartInfoQuery, [cartIds]);
         const cartInfoResult = await new Promise((resolve, reject) => {
             db.query(cartInfoQuery, [cartIds], (error, result) => {
                 if (error) {
-                    reject(error);
+                    reject(error)
                 } else {
-                    resolve(result);
+                    resolve(result)
                 }
-            });
-        });
+            })
+        })
 
         // console.log('cartInfoResult: ', cartInfoResult)
 
         // 计算总数量
-        const totalCount = cartInfoResult.reduce((total, item) => total + parseInt(item.count), 0);
+        const totalCount = cartInfoResult.reduce((total, item) => total + parseInt(item.count), 0)
         console.log('totalCount: ', totalCount)
 
         // 将购物车信息与订单信息合并
@@ -210,9 +210,9 @@ exports.getLatestOrder = async (req, res) => {
             latestOrder,
             products: cartInfoResult,
             totalCount
-        };
+        }
         // console.log('getLatestOrderResult: ', getLatestOrderResult)
-        return res.status(200).json({ code: 1, msg: "获取用户最新订单成功", result: getLatestOrderResult });
+        return res.status(200).json({ code: 1, msg: "获取用户最新订单成功", result: getLatestOrderResult })
     } catch (error) {
         console.error('Error fetching latest order:', error);
         return res.status(500).json({ code: 0, msg: "获取用户最新订单失败" });
@@ -222,25 +222,25 @@ exports.getLatestOrder = async (req, res) => {
 
 // 获取用户全部订单的全部数据或特定状态的订单数据
 exports.getAllOrders = async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
-    const token = authorizationHeader?.replace("Bearer ", "");
+    const authorizationHeader = req.headers['authorization']
+    const token = authorizationHeader?.replace("Bearer ", "")
 
     if (!token) {
-        return res.status(401).json({ code: 0, msg: "未提供授权的访问令牌" });
+        return res.status(401).json({ code: 0, msg: "未提供授权的访问令牌" })
     }
 
-    const userId = getUserIdFromToken(token);
+    const userId = getUserIdFromToken(token)
 
     if (!userId) {
-        return res.status(401).json({ code: 0, msg: "未授权的访问" });
+        return res.status(401).json({ code: 0, msg: "未授权的访问" })
     }
 
     // 提取查询参数中的 orderState，若不存在则默认为 '0'
     const orderState = req.query.orderState || '0'
-    console.log('orderState:', orderState);
+    console.log('orderState:', orderState)
 
     try {
-        let query, queryParams;
+        let query, queryParams
 
         if (orderState === '0') {
             // 获取用户全部订单的全部数据
@@ -259,29 +259,29 @@ exports.getAllOrders = async (req, res) => {
                 WHERE userId = ? AND orderState = ?
                 ORDER BY createTime DESC
             `;
-            queryParams = [userId, orderState];
+            queryParams = [userId, orderState]
         }
 
         const result = await new Promise((resolve, reject) => {
             db.query(query, queryParams, (error, result) => {
                 if (error) {
-                    reject(error);
+                    reject(error)
                 } else {
-                    resolve(result);
+                    resolve(result)
                 }
-            });
-        });
+            })
+        })
 
         // 如果没有找到订单数据，则返回空数组
         if (result.length === 0) {
-            return res.status(200).json({ code: 1, msg: "用户订单数据为空", result: [] });
+            return res.status(200).json({ code: 1, msg: "用户订单数据为空", result: [] })
         }
 
         // 存储所有订单信息的数组
-        const allOrders = [];
+        const allOrders = []
 
         for (const order of result) {
-            const cartIds = JSON.parse(order.cartIds);
+            const cartIds = JSON.parse(order.cartIds)
 
             // 查询购物车中的商品信息
             if (cartIds.length > 0) {
@@ -291,20 +291,20 @@ exports.getAllOrders = async (req, res) => {
                     INNER JOIN skus s ON c.skuId = s.id
                     INNER JOIN products p ON s.productId = p.id
                     WHERE c.id IN (?)
-                `;
+                `
 
                 const cartInfoResult = await new Promise((resolve, reject) => {
                     db.query(cartInfoQuery, [cartIds], (error, result) => {
                         if (error) {
-                            reject(error);
+                            reject(error)
                         } else {
-                            resolve(result);
+                            resolve(result)
                         }
-                    });
-                });
+                    })
+                })
 
                 // 计算总数量
-                const totalCount = cartInfoResult.reduce((total, item) => total + parseInt(item.count), 0);
+                const totalCount = cartInfoResult.reduce((total, item) => total + parseInt(item.count), 0)
 
                 // 将购物车信息与订单信息合并
                 const orderDetails = {
@@ -313,14 +313,14 @@ exports.getAllOrders = async (req, res) => {
                     totalCount
                 };
 
-                allOrders.push(orderDetails);
+                allOrders.push(orderDetails)
             }
         }
 
-        return res.status(200).json({ code: 1, msg: "获取用户订单数据成功", result: allOrders });
+        return res.status(200).json({ code: 1, msg: "获取用户订单数据成功", result: allOrders })
     } catch (error) {
         console.error('Error fetching orders:', error);
-        return res.status(500).json({ code: 0, msg: "获取用户订单数据失败" });
+        return res.status(500).json({ code: 0, msg: "获取用户订单数据失败" })
     }
 }
 

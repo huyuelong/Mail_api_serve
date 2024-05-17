@@ -93,7 +93,7 @@ exports.getCart = (req, res) => {
         INNER JOIN skus ON cart.skuId = skus.id
         INNER JOIN products ON skus.productId = products.id
         WHERE cart.userId = ? AND cart.istraded = 0
-    `;
+    `
     const values = [userId]
 
     db.query(sql, values, (err, result) => {

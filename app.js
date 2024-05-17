@@ -47,6 +47,8 @@ const cartRouter = require('./router/cart')
 const addressRouter = require('./router/addresses')
 const orderRouter = require('./router/order')
 const payRouter = require('./router/pay')
+const recommendRouter = require('./router/recomment')
+const searchRouter = require('./router/search')
 app.use('/api', userRouter)
 app.use('/api', categoriesRouter)
 app.use('/api', homeRouter)
@@ -55,6 +57,8 @@ app.use('/api', cartRouter)
 app.use('/api', addressRouter)
 app.use('/api', orderRouter)
 app.use('/api', payRouter)
+app.use('/api', recommendRouter)
+app.use('/api', searchRouter)
 
 // 定义错误级别中间件
 app.use(function (err, req, res, next) {

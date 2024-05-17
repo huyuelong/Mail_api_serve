@@ -3,9 +3,9 @@ const db = require('../db/index')
 // 获取banner轮播图数据
 exports.getBanners = (req, res) => {
     // 获取查询参数 distributionSite，如果没有提供则默认为 1
-    const distribution_site = req.query.distribution_site || '1';
+    const distribution_site = req.query.distribution_site || '1'
 
-    const sql = 'SELECT * FROM banners WHERE distribution_site = ?';
+    const sql = 'SELECT * FROM banners WHERE distribution_site = ?'
     db.query(sql, distribution_site, (error, results) => {
         if (error) {
             console.error(error);
@@ -89,30 +89,30 @@ exports.getCategoriesWithProducts = (req, res) => {
     // 查询类别数据
     db.query('SELECT * FROM categories WHERE id <= 7', (err, categories) => {
         if (err) {
-            console.error('Error fetching categories:', err);
+            console.error('Error fetching categories:', err)
             res.status(500).json({
                 code: '-1',
-                msg: '获取类别数据失败',
+                msg: '获取分类数据失败',
                 error: err.message,
-            });
-            return;
+            })
+            return
         }
 
         // 查询产品数据
         db.query('SELECT * FROM products', (err, products) => {
             if (err) {
-                console.error('Error fetching products:', err);
+                console.error('Error fetching products:', err)
                 res.status(500).json({
                     code: '-1',
                     msg: '获取产品数据失败',
                     error: err.message,
                 });
-                return;
+                return
             }
 
             // 将产品数据嵌入到相应的类别中
             const categoriesWithProducts = categories.map(category => {
-                const filteredProducts = products.filter(product => product.category_id === category.id);
+                const filteredProducts = products.filter(product => product.category_id === category.id)
                 return {
                     ...category,
                     children: filteredProducts,
@@ -123,8 +123,8 @@ exports.getCategoriesWithProducts = (req, res) => {
                 code: '1',
                 msg: '成功',
                 result: categoriesWithProducts,
-            });
-        });
-    });
-};
+            })
+        })
+    })
+}
 

@@ -34,7 +34,7 @@ exports.getAddress = (req, res) => {
             fullLocation: result.fullLocation,
             postalCode: result.postalCode,
             addressTags: result.addressTags
-        }));
+        }))
         return res.status(200).json({ code: "1", msg: "获取成功", result: formattedResults })
     })
 }

@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const pay_handler = require('../router_handler/pay')
 
+// 支付
 router.post('/alipay', pay_handler.pay)
 router.post('/querypay', pay_handler.querypay)
 

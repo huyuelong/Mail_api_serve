@@ -8,7 +8,7 @@ exports.pay = (req, res) => {
     // 获取回调地址
     // const redirectUrl = decodeURIComponent(req.query.redirect)
     // 对接支付宝
-    const formData = new AlipayFormData();
+    const formData = new AlipayFormData()
     formData.setMethod('get')
 
     // 支付时信息
@@ -77,7 +77,7 @@ exports.querypay = (req, res) => {
             method: "GET",
             url: resData
         }).then(resdata => {
-            let respondeCode = resdata.data.alipay_trade_query_response;
+            let respondeCode = resdata.data.alipay_trade_query_response
             if (respondeCode.code == 10000) {
                 switch (respondeCode.trade_status) {
                     case 'WAIT_BUYER_PAY':
@@ -85,7 +85,7 @@ exports.querypay = (req, res) => {
                             code: 10001,
                             message: "支付宝有交易记录，没付款"
                         })
-                        break;
+                        break
                     case 'TRADE_FINISHED':
                         // 完成交易的逻辑
                         updateOrderStatus(out_trade_no)
@@ -93,7 +93,7 @@ exports.querypay = (req, res) => {
                             code: 10002,
                             message: "交易完成(交易结束，不可退款)"
                         })
-                        break;
+                        break
                     case 'TRADE_SUCCESS':
                         // 完成交易的逻辑
                         updateOrderStatus(out_trade_no)
@@ -101,14 +101,14 @@ exports.querypay = (req, res) => {
                             code: 10002,
                             message: "交易完成"
                         })
-                        break;
+                        break
                     case 'TRADE_CLOSED':
                         // 交易关闭的逻辑
                         res.send({
                             code: 10003,
                             message: "交易关闭"
                         })
-                        break;
+                        break
                 }
             } else if (respondeCode.code == 40004) {
                 return res.send({
